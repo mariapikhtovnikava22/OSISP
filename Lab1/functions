@@ -1,0 +1,226 @@
+user_inp(){
+
+    local word
+    local category
+    local inp_text="Enter your word: "
+    local hello_str="\t\nWELCOME TO THE GALLOWS GAME!!!\n"
+    local type_game="\e[46m####### Your current game with human #######\e[0m \n"
+    local error_mes=""
+    
+    while true; do
+        clear
+        echo -e  $hello_str
+        echo -e "$type_game"
+        echo -e "$error_mes"
+        read -s -p "$inp_text" word
+        
+        if [[ ! "$word" =~ ^[a-zA-Z]+$ ]]; then
+            error_mes="\e[31mError!!!Enter a word containing only English characters!\e[0m"
+            continue
+        else
+            inp_text="Enter your category: "
+            error_mes=""
+            upcategory "$1" $word
+            break
+        fi
+        
+    done
+
+    while true; do
+
+        clear
+        echo -e  $hello_str
+        echo -e "$type_game"
+        echo -e "$error_mes"
+        read -p "$inp_text" category 
+
+        if [[ ! "$category" =~ ^[a-zA-Z]+$ ]]; then
+	        error_mes="\e[31mError!!!Enter a category containing only English characters!\e[0m"
+            continue
+        else
+            upcategory "$2" $category
+            break
+        fi
+
+    done
+ 
+}
+
+
+machine_inp(){
+
+   words=("apple" "banana" "grape" "pineapple" "potato" "tomato" "beans" "carrot" 
+   pizza cheese pasta ham egg meat red blue green pink violet orange
+   bear fox pig moouse camel horse desk marker backpack pen lesson physics)
+   
+   rand_word=$(getRandomWord)
+   echo "$rand_word"
+   get_category "category" "$rand_word"
+
+   
+}
+ 
+
+getRandomWord() {
+    local random_index=$(( RANDOM % ${#words[@]} ))
+    echo "${words[$random_index]}"
+}
+
+upcategory() {
+    unset -v "$1" && eval "${1}=\$2" # или можно так:     eval "$1"'=$2'
+}
+
+get_category(){
+
+   upcategory "$1" 'unknown'
+   case $2 in
+        apple | banana | grape | pineapple)
+            upcategory "$1" 'fruit'
+            ;;
+        potato | tomato | beans | carrot)
+            upcategory "$1" 'vegetable'
+            ;;
+        pizza | cheese | pasta | ham | egg | meat)
+            upcategory "$1" 'food'
+            ;; 
+        red | blue | green | pink | violet | orange)
+            upcategory "$1" 'colors'
+            ;;  
+        bear | fox | elephant | moouse | camel | horse | pig)
+            upcategory "$1" 'animals'
+            ;;   
+        desk | marker | backpack | pen | lesson | physics)
+            upcategory "$1" 'school'
+            ;;    
+   esac
+}
+
+
+drawHangman() {
+    local attemptsLeft=$1
+    case $attemptsLeft in
+        6)
+            cat << "EOF"
+  ____
+ |    |
+ |     
+ |     
+ |     
+ |     
+_|______
+EOF
+            ;;
+        5)
+            cat << "EOF"
+  ____
+ |    |
+ |    O
+ |     
+ |     
+ |     
+_|______
+EOF
+            ;;
+        4)
+            cat << "EOF"
+  ____
+ |    |
+ |    O
+ |    |
+ |     
+ |     
+_|______
+EOF
+            ;;
+        3)
+            cat << "EOF"
+  ____
+ |    |
+ |    O
+ |   /|
+ |     
+ |     
+_|______
+EOF
+            ;;
+        2)
+            cat << "EOF"
+  ____
+ |    |
+ |    O
+ |   /|\
+ |     
+ |     
+_|______
+EOF
+            ;;
+        1)
+            cat << "EOF"
+  ____
+ |    |
+ |    O
+ |   /|\
+ |   / 
+ |     
+_|______
+EOF
+            ;;
+        0)
+            cat << "EOF"
+  ____
+ |    |
+ |    O
+ |   /|\
+ |   / \
+ |     
+_|______
+EOF
+            ;;
+    esac
+}
+
+
+check_word() {
+    
+    local word=$1
+    local letter=$2
+    declare -a positions
+    for (( i=0; i < ${#word}; i++ )); do 
+        if [[ "${word:i:1}" == "$letter" ]]; then
+            positions+=($i)
+        fi
+    done
+
+    echo ${positions[@]}
+
+    if [[ -z ${positions[@]} ]]; then
+        return 1
+    fi
+
+}
+
+print_word(){
+    
+    local secret_word=$1
+    shift
+    local let_position=("$@")
+    
+    local bool=0
+
+    for ((i=0; i<${#secret_word}; i++)); do
+        for (( y=0; y<${#let_position[@]}; y++)); do
+            if [[ $i == ${let_position[y]} ]]; then
+                new_word+=" ${secret_word:i:1}"
+                bool=1
+            fi
+        done
+
+        if [ $bool == 0 ]; then
+            new_word+=" _"
+        fi
+        bool=0
+         
+    done
+
+    echo $new_word
+}
