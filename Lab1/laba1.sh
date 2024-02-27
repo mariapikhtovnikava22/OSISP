@@ -394,7 +394,9 @@ start()
             fi  
             
             if [[ $attempts == 0 ]]; then
+                 
                 clear
+                {
                 echo -e $hello_str
                 echo -e "$type_game"
 
@@ -411,6 +413,9 @@ start()
                 echo -e "\n$(print_word "$word" "${position[@]}")\n"
 
                 sed 's/.*/\x1b[31m&\x1b[0m/' lose
+                } > screenshot.txt
+
+                cat screenshot.txt
                 break
             fi     
 

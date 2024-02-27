@@ -3,3 +3,10 @@ You guessed the word on the 6nd try
 You guessed the word on the 6nd try
 You lose
 You guessed the word on the 4nd try
+You lose
+You guessed the word on the 2nd try
+You guessed the word on the 3nd try
+You guessed the word on the 5nd try
+You lose
+You lose
+You lose
